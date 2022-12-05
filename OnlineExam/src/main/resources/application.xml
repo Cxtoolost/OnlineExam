@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--数据源-->
+    <context:property-placeholder location="classpath:dataBase/db.properties"/>
+    <!--扫描业务层-->
+    <context:component-scan base-package="service"/>
+    <!--配置数据源-->
+    <bean id="ds" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${mysql.driver}"/>
+        <property name="url" value="${mysql.url}"/>
+        <property name="username" value="${mysql.username}"/>
+        <property name="password" value="${mysql.password}"/>
+    </bean>
+    <!--整合mybatis-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+        <property name="dataSource" ref="ds"/>
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+        <property name="typeAliasesPackage" value="pojo"/>
+    </bean>
+    <!--扫描dao包-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+    <!--aop注解-->
+    <aop:aspectj-autoproxy/>
+    <!--    事务:启动事务的注解开发方式(扫描业务层/定义事务管理器/增强的事务/组织切面)-->
+    <!--    注解方式:@Transactional-->
+    <tx:annotation-driven/>
+</beans>
